@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if request.user.is_superuser %}
+    <h1>{{ title }}</h1>
+<div class="bread">
+<a href="{% url 'index' %}" >Вернуться на главную</a>
+</div>
+<div class="row">
+    <table class="table table-striped-columns">
+      <thead>
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">First Name</th>
+          <th scope="col">Last Name</th>
+          <th scope="col">Telegram ID</th>
+          <th scope="col">Дата подписки</th>
+          <th scope="col">Теги</th>
+          <th scope="col">Текущий шаг</th>
+          <th scope="col">Done</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for subscriber in subscribers %}
+        <tr>
+          <td>
+              {% if subscriber.info.username %}
+                <a href="https://t.me/{{ subscriber.info.username }}" target="_blank">@{{ subscriber.info.username }}</a>
+              {% else %}
+                Нет логина
+              {% endif %}
+          </td>
+          <td>
+              {% if subscriber.info.first_name %}
+                {{ subscriber.info.first_name }}
+              {% else %}
+                -
+              {% endif %}
+          </td>
+          <td>
+              {% if subscriber.info.last_name %}
+                {{ subscriber.info.last_name }}
+              {% else %}
+                -
+              {% endif %}
+          </td>
+          <td><a href="tg://user?id={{ subscriber.info.telegram_id }}" target="_blank">{{ subscriber.info.telegram_id }}</a></td>
+          <td>{{ subscriber.info.created_at }}</td>
+          <td>
+              {% for tag in subscriber.info.tags.all %}
+              <div class="tag-label">{{ tag.name }} ({{ tag.subscribers.count }})</div>
+              {% endfor %}
+          </td>
+          <td>{{ subscriber.current_step.current_step }}</td>
+          <td>
+              {% if subscriber.current_step.is_completed %}
+              ✅
+              {% else %}
+              ❌
+              {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+
+</div>
+
+{% else %}
+<p>Недостаточно прав</p>
+{% endif %}
+{% endblock %}

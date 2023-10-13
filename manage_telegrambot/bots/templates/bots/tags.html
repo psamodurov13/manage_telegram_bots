@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if request.user.is_superuser %}
+    <h1>{{ title }}</h1>
+<div class="bread">
+<a href="{% url 'index' %}" >Вернуться на главную</a>
+</div>
+<div class="row">
+    <table class="table table-striped-columns">
+      <thead>
+        <tr>
+          <th scope="col">Название</th>
+          <th scope="col">Количество</th>
+          <th scope="col">Пользователи</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tag in tags %}
+        <tr>
+          <td>{{ tag.info.name }}</td>
+          <td>{{ tag.subscribers_with_tag.count }}</td>
+          <td>
+              {% for subscriber in tag.subscribers_with_tag %}
+              {% if subscriber.username %}
+              <a href="https://t.me/{{ subscriber.username }}" target="_blank" class="tag-label">{{ subscriber.username }}</a>
+              {% else %}
+              <a href="tg://user?id={{ subscriber.info.telegram_id }}" target="_blank" class="tag-label">{{ subscriber.telegram_id }}</a>
+              {% endif %}
+              {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+
+</div>
+
+{% else %}
+<p>Недостаточно прав</p>
+{% endif %}
+{% endblock %}

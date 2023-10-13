@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+{% if request.user.is_superuser %}
+    <h1>{{ title }}</h1>
+<div class="bread">
+<a href="{% url 'index' %}" >Вернуться на главную</a>
+</div>
+<div class="row">
+    <table class="table table-striped-columns">
+      <thead>
+        <tr>
+          <th scope="col">Название</th>
+          <th scope="col">Тег</th>
+          <th scope="col">Время</th>
+          <th scope="col">Всего пользователей</th>
+          <th scope="col">Доставлено</th>
+          <th scope="col">Все доставлено</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for mailing in mailings %}
+        <tr>
+          <td>{{ mailing.info.name }}</td>
+          <td>
+              {% if mailing.info.tag %}
+                {{ mailing.info.tag.name }}
+              {% else %}
+                Все пользователи
+              {% endif %}
+          </td>
+          <td>{{ mailing.info.time }}</td>
+          <td>{{ mailing.total }}</td>
+          <td>{{ mailing.delivered }}</td>
+          <td>
+              {% if mailing.delivered == mailing.total %}
+              ✅
+              {% else %}
+              ❌
+              {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+
+</div>
+
+{% else %}
+<p>Недостаточно прав</p>
+{% endif %}
+{% endblock %}

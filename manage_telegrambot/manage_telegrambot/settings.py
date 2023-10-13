@@ -60,7 +60,9 @@ ROOT_URLCONF = 'manage_telegrambot.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        "DIRS": [
+            BASE_DIR / 'templates/',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,6 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 TIME_ZONE = "Asia/Ho_Chi_Minh"
+# TIME_ZONE = "Asia/Ho_Chi_Minh"
 LANGUAGE_CODE = "ru-ru"
 
 USE_I18N = True

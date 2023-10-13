@@ -1,0 +1,73 @@
+h6.card-header {
+    background: none;
+    padding: 10px 0;
+    font-size: 18px;
+    color: purple;
+    border-bottom: none;
+}
+
+.metrika, .tag, .mailing {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metrika .card-label, .card-subtitle {
+    color: #acacac !important;
+}
+
+.rate {
+font-size: 28px;
+}
+
+.tag .card-label, .tag-label {
+    background-color: #dd7ddd;
+    padding: 0px 10px;
+    font-size: 14px;
+    color: white;
+    border-radius: 6px;
+}
+.tag-label {
+margin-bottom:5px;
+font-size: 10px;
+padding: 2px 10px;
+text-decoration: none;
+}
+.bread {
+margin: 15px 0;
+}
+
+.gray-text {
+color: #acacac !important;
+font-style: italic;
+}
+.green {
+color: green;
+}
+.red {
+color: red;
+}
+
+.mailing-tag {
+color: #acacac !important;
+font-style: italic;
+font-size: 12px;
+margin-left: 20px;
+}
+.links {
+margin-top:15px;
+}
+.links a {
+display: block;
+margin-left: 0 !important;
+}
+.header-block {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.header-block .more {
+font-style: italic;
+font-size: 12px;
+}
+

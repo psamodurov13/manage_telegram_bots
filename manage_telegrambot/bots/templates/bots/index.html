@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+
+{% block content %}
+{% if request.user.is_superuser %}
+    <h1>{{ title }}</h1>
+<a class="btn btn-primary my-3 me-3" href="{% url 'restart_bots' %}">Перезапустить боты</a>
+<div class="row">
+    {% for bot in bots %}
+    <div class="col-sm-12 col-md-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ bot.info.name }}</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">{{ bot.info.username }}</h6>
+            <h6 class="card-header">Подписчики</h6>
+            <div class="metrika">
+                <div class="card-label">Всего</div>
+                <div class="rate">{{ bot.subscribers }}</div>
+            </div>
+            <div class="metrika">
+                <div class="card-label">Прошли воронку</div>
+                <div class="rate">{{ bot.completed_subscribers }}</div>
+            </div>
+            <div class="metrika">
+                <div class="card-label">В процессе</div>
+                <div class="rate">{{ bot.active_subscribers }}</div>
+            </div>
+
+              <div class="header-block">
+                <h6 class="card-header">Теги</h6>
+                <div class="more"><a href="{% url 'tags' bot.info.id %}">Все теги</a></div>
+              </div>
+            {% if bot.tags %}
+            {% for tag in bot.tags|slice:"5" %}
+              <div class="tag">
+                  <div class="card-label">{{ tag.info.name }}</div>
+                  <div class="rate">{{ tag.subscribers_with_tag.count }}</div>
+              </div>
+            {% endfor %}
+            {% else %}
+              <p class="gray-text">Теги еще не присвоены</p>
+            {% endif %}
+              <div class="header-block">
+                <h6 class="card-header">Рассылки</h6>
+                <div class="more"><a href="{% url 'mailings' bot.info.id %}">Все рассылки</a></div>
+              </div>
+            {% if bot.mailings %}
+            {% for mailing in bot.mailings|slice:"3" %}
+              <div class="mailing">
+                  <div class="card-label">
+                      <div>{{ mailing.info.name }}</div>
+                      <div class="mailing-tag">Тег: {% if mailing.info.tag %}{{ mailing.info.tag }}{% else %}все{% endif %}</div>
+                  </div>
+                  <div class="rate {% if mailing.delivered == mailing.total %}green{% else %}red{% endif %}"><span class="delivered">{{ mailing.delivered }}</span>/<span class="delivered">{{ mailing.total }}</span></div>
+              </div>
+            {% endfor %}
+            {% else %}
+              <p class="gray-text">Рассылок еще не было</p>
+            {% endif %}
+            <div class="links">
+                <a href="{% url 'subscribers' bot.info.id %}" class="card-link">Посмотреть пользователей</a>
+                <a href="https://t.me/{{ bot.info.username }}" target="_blank" class="card-link">Ссылка на бот</a>
+            </div>
+          </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<p>Недостаточно прав</p>
+{% endif %}
+{% endblock %}

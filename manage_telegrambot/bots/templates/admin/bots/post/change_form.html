@@ -1,0 +1,12 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block submit_buttons_bottom %}
+    {% if change %}
+    <input value="Отправить тестовое сообщение" type="button" onclick="location.href='{% url 'admin:post_view' original.pk %}'" />
+    {% endif %}
+
+{{ block.super }}
+
+{% endblock %}
+

@@ -1,7 +1,12 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect
+
 from .models import *
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django import forms
+from django.urls import reverse, path
+from django.utils.html import format_html
 
 
 class PostAdminForm(forms.ModelForm):
@@ -61,11 +66,56 @@ class PostAdmin(BaseAdmin):
     form = PostAdminForm
     list_display = ('id', 'name', 'count', 'default_next_integer', 'bot', 'timer', 'time', 'post_type',)
     list_display_links = ('id', 'name')
-    list_editable = ('count', 'default_next_integer', 'timer', 'time', )
+    # list_editable = ('count', 'default_next_integer', 'timer', 'time', )
     search_fields = ('count', 'text', 'buttons')
     list_filter = ('bot', 'post_type')
 
+    def get_urls(self):
+        # метод обработки url, с подстановкой необходимой view.
+
+        urls = super(PostAdmin, self).get_urls()
+        custom_urls = [
+            path('text-message/<int:obj_id>', self.admin_site.admin_view(self.send_text_message), name='post_view'), ]
+        return custom_urls + urls
+
+    def send_text_message(self, request, obj_id):
+        logger.info(f'!!!!!!!! {obj_id}')
+        post_obj = Post.objects.get(id=obj_id)
+        post_info = {
+            'name': post_obj.name,
+            'text': post_obj.text if post_obj.text else None,
+            'emoji': post_obj.emoji if post_obj.emoji else None,
+            'photo': post_obj.photo.url if post_obj.photo else None,
+            'photo2': post_obj.photo2.url if post_obj.photo2 else None,
+            'photo3': post_obj.photo3.url if post_obj.photo3 else None,
+            'photo4': post_obj.photo4.url if post_obj.photo4 else None,
+            'photo5': post_obj.photo5.url if post_obj.photo5 else None,
+            'audio': post_obj.audio.url if post_obj.audio else None,
+            'video': post_obj.video.url if post_obj.video else None,
+        }
+        buttons = []
+        if post_obj.buttons.all():
+            for button in post_obj.buttons.all():
+                buttons.append({
+                    'name': button.name,
+                    'button_text': button.button_text,
+                    'action': button.action.id,
+                    'button_url': button.button_url,
+                    'next_post_id': button.next_post.id
+                })
+        logger.info(f'BUTTONS - {buttons}')
+        post_info['buttons'] = buttons
+        data = {
+            'post_pk': post_obj.id,
+            'post_info': post_info,
+            'bot_username': post_obj.bot.username,
+        }
+        result = rq.post(f'{API_URL}send-test-message', data=json.dumps(data), headers=headers)
+        logger.info(f'RESULT - {result}')
+        return redirect(request.META['HTTP_REFERER'])
+
     class Media:
+        model = Post
         css = {
             'all': ('admin/css/custom_admin.css',),
         }

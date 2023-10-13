@@ -3,6 +3,9 @@ from manage_telegrambot.utils import CustomStr
 import requests as rq
 from loguru import logger
 from manage_telegrambot.config import API_TOKEN, API_URL
+import json
+from manage_telegrambot.config import headers
+import time
 
 
 class Bot(CustomStr, models.Model):
@@ -120,7 +123,8 @@ class Subscribers(CustomStr, models.Model):
 
 
 class CurrentSteps(CustomStr, models.Model):
-    subscriber = models.ForeignKey(Subscribers, verbose_name='Подписчик', on_delete=models.CASCADE)
+    subscriber = models.ForeignKey(Subscribers, verbose_name='Подписчик', on_delete=models.CASCADE,
+                                   related_name='current_steps')
     bot = models.ForeignKey(Bot, verbose_name='Бот', on_delete=models.CASCADE, related_name='current_steps')
     current_step = models.CharField(max_length=255, verbose_name='Текущий шаг',
                                     help_text='Идентификатор поста, который должен быть отправлен следующим')
@@ -144,9 +148,47 @@ class Mailings(CustomStr, models.Model):
     button_text = models.CharField(verbose_name='Текст кнопки', max_length=100, blank=True, null=True)
     button_url = models.CharField(verbose_name='Ссылка', max_length=255, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        super(Mailings, self).save(*args, **kwargs)
+        mailing_info = {
+                    'name': self.name,
+                    'text': self.text,
+                    'photo': self.photo.url if self.photo else None,
+                    'video': self.video.url if self.video else None,
+                    'tag_id': self.tag.id if self.tag else None,
+                    'bot_id': self.bot.id,
+                    'button_text': self.button_text,
+                    'button_url': self.button_url,
+                }
+        mailing_pk = self.id
+        if self.tag:
+            all_users_id = [i.subscriber_id for i in CurrentSteps.objects.filter(bot=self.bot)]
+            logger.info(f'ALL USERS ID - {all_users_id}')
+            users = [[i.telegram_id, i.id] for i in Subscribers.objects.filter(id__in=all_users_id, tags=self.tag)]
+            logger.info(f'ALL USERS ID - {users}')
+        else:
+            users = [[i.subscriber.telegram_id, i.subscriber_id] for i in CurrentSteps.objects.filter(bot=self.bot)]
+            logger.info(f'ALL USERS ID - {users}')
+        logger.info(f'TIME {self.time}')
+        logger.info(f'TIMESTAMP {self.time.timestamp()}')
+        interval = self.time.timestamp() - time.time()
+        logger.info(f'INTERVAL {interval}')
+        data = {
+            'mailing_pk': mailing_pk,
+            'mailing_info': mailing_info,
+            'interval': interval,
+            'users_telegram_id_id': users,
+            'bot_username': self.bot.username
+        }
+        logger.info(f'Mailing PK - {mailing_pk}')
+        logger.info(f'Mailing INFO - {mailing_info}')
+        result = rq.post(f'{API_URL}start-mailing', data=json.dumps(data), headers=headers)
+        logger.info(f'RESULT - {result}')
+
     class Meta:
         verbose_name = 'Рассылка'
         verbose_name_plural = 'Рассылки'
+        ordering = ['-id']
 
 
 class MailingDelivery(CustomStr, models.Model):
