@@ -156,7 +156,7 @@ def user_logout(request):
 def download_subscribers(request):
     all_bots = Bot.objects.all()
     result = [
-        ['ID', 'Username', 'First Name', 'Last Name', 'Created', 'Tags']
+        ['ID', 'Username', 'First Name', 'Last Name', 'Created', 'Tags', 'Bot']
     ]
     for bot in all_bots:
         current_step_bot_subscribers_id = CurrentSteps.objects.filter(bot=bot)
@@ -168,7 +168,8 @@ def download_subscribers(request):
                 subscriber.first_name,
                 subscriber.last_name,
                 subscriber.created_at,
-                ', '.join([i.name for i in subscriber.tags.all()])
+                ', '.join([i.name for i in subscriber.tags.all()]),
+                bot.name
             ])
             logger.info(f'RESULT -1 {result[-1]}')
     return ExcelResponse(result, 'subscribers_data')
