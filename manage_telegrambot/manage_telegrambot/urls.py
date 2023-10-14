@@ -19,6 +19,8 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
+admin.site.site_header = 'TelegramBots Management Administration'
+
 urlpatterns = [
     path('', include('bots.urls')),
     path('admin/', admin.site.urls),

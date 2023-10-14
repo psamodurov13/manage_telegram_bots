@@ -1,9 +1,12 @@
 from django.contrib import messages
+from django.contrib.auth import login, logout
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
+from excel_response import ExcelResponse
 from loguru import logger
 from .models import *
 from django.contrib.auth.decorators import login_required
+from .forms import *
 
 
 @login_required
@@ -119,5 +122,55 @@ def restart_bots(request):
     return redirect('index')
 
 
+def login_page(request):
+    login_form = UserLoginForm()
+    context = {
+        'login_form': login_form,
+    }
+    return render(request, 'bots/login.html', context)
+
+
+def user_login(request):
+    if request.method == 'POST' and 'login-button' in request.POST:
+        login_form = UserLoginForm(data=request.POST)
+        # register_form = UserRegisterForm()
+        if login_form.is_valid():
+            user = login_form.get_user()
+            login(request, user)
+            messages.success(request, 'Вход выполнен')
+        else:
+            messages.error(request, 'Вход не выполнен, проверьте форму')
+            return render(request, 'bots/login.html', {'login_form': login_form})
+    if request.user.is_superuser:
+        return redirect('index')
+    else:
+        return redirect('index')
+
+
+def user_logout(request):
+    logout(request)
+    messages.success(request, 'Вы вышли из аккаунта')
+    return redirect('index')
+
+
+def download_subscribers(request):
+    all_bots = Bot.objects.all()
+    result = [
+        ['ID', 'Username', 'First Name', 'Last Name', 'Created', 'Tags']
+    ]
+    for bot in all_bots:
+        current_step_bot_subscribers_id = CurrentSteps.objects.filter(bot=bot)
+        subscribers = Subscribers.objects.filter(id__in=[i.subscriber.id for i in current_step_bot_subscribers_id])
+        for subscriber in subscribers:
+            result.append([
+                subscriber.telegram_id,
+                subscriber.username,
+                subscriber.first_name,
+                subscriber.last_name,
+                subscriber.created_at,
+                ', '.join([i.name for i in subscriber.tags.all()])
+            ])
+            logger.info(f'RESULT -1 {result[-1]}')
+    return ExcelResponse(result, 'subscribers_data')
 
 

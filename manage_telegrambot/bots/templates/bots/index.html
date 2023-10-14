@@ -7,6 +7,7 @@
 {% if request.user.is_superuser %}
     <h1>{{ title }}</h1>
 <a class="btn btn-primary my-3 me-3" href="{% url 'restart_bots' %}">Перезапустить боты</a>
+<a class="btn btn-primary my-3 me-3" href="{% url 'download_subscribers' %}">Импорт подписчиков</a>
 <div class="row">
     {% for bot in bots %}
     <div class="col-sm-12 col-md-4">

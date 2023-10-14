@@ -42,8 +42,15 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'bots.apps.BotsConfig',
     'celery',
-    'flower'
+    'flower',
+    'crispy_forms',
+    'crispy_bootstrap5'
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -131,6 +138,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+LOGIN_URL = 'login_page'
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'static/'
