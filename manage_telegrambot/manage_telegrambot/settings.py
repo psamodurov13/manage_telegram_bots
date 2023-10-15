@@ -20,9 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-t27r$&(cs=gh*g-pid*)k079j_a@e3lg(rv6f)2a_^4(j7ho*h'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -179,4 +176,10 @@ CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+try:
+    from .local_settings import *
+except ImportError:
+    from .prod_settings import *
+
 
