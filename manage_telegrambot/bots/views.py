@@ -63,6 +63,7 @@ def index_view(request):
 @login_required
 def subscribers_view(request, bot_id):
     bot = Bot.objects.get(id=bot_id)
+    logger.info(f'BOT {bot}')
     current_step_bot_subscribers_id = CurrentSteps.objects.filter(bot=bot)
     logger.info(f'current_step_bot_subscribers_id - {current_step_bot_subscribers_id}')
     subscribers = Subscribers.objects.filter(id__in=[i.subscriber.id for i in current_step_bot_subscribers_id])
@@ -99,14 +100,19 @@ def mailings_view(request, bot_id):
 @login_required
 def tags_view(request, bot_id):
     bot = Bot.objects.get(id=bot_id)
-    all_tags = Tags.objects.all()
+    posts = Post.objects.filter(bot=bot)
+    all_tags = []
+    for post in posts:
+        tags_from_post = post.add_tags.all()
+        all_tags.extend(tags_from_post)
     tags = []
     current_step_bot_subscribers_id = CurrentSteps.objects.filter(bot=bot)
     subscribers = Subscribers.objects.filter(id__in=[i.subscriber.id for i in current_step_bot_subscribers_id])
     for tag in all_tags:
         logger.info(f'TAG INFO {tag}')
         subscribers_with_tag = subscribers.filter(tags=tag)
-        tags.append({'info': tag, 'subscribers_with_tag': subscribers_with_tag})
+        if subscribers_with_tag:
+            tags.append({'info': tag, 'subscribers_with_tag': subscribers_with_tag})
     context = {
         'title': f'Теги бота "{bot.name} ({bot.username})"',
         'tags': tags

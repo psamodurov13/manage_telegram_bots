@@ -16,11 +16,11 @@ class Bot(CustomStr, models.Model):
     token = models.CharField(max_length=255, verbose_name='Token', help_text='Токен из BotFather')
     status = models.BooleanField(default=False, verbose_name='Включен')
 
-    def save(self, *args, **kwargs):
-        super(Bot, self).save(*args, **kwargs)
-        result = rq.get(f'{API_URL}restart/{API_TOKEN}')
-        logger.info(f'REQUEST RESULT API - {result}')
-        logger.info(f'REQUEST RESULT API - {result.text}')
+    # def save(self, *args, **kwargs):
+    #     super(Bot, self).save(*args, **kwargs)
+    #     result = rq.get(f'{API_URL}restart/{API_TOKEN}')
+    #     logger.info(f'REQUEST RESULT API - {result}')
+    #     logger.info(f'REQUEST RESULT API - {result.text}')
 
     class Meta:
         verbose_name = 'Бот'
@@ -72,23 +72,23 @@ class Post(CustomStr, models.Model):
     name = models.CharField(max_length=255, verbose_name='Название поста',
                             help_text='Используется только для удобства администрирования')
     text = models.TextField(verbose_name='Текст поста', blank=True, null=True, help_text='Текстовая часть сообщения')
-    emoji = models.CharField(max_length=25, verbose_name='Emoji', blank=True, null=True, help_text='Emoji')
+    emoji = models.CharField(max_length=25, verbose_name='Emoji', blank=True, null=True, help_text='Вставьте Emoji')
     photo = models.ImageField(verbose_name='Фото файл', upload_to='photo/', blank=True, null=True,
-                             help_text='Загрузите фото файл в формате .jpg')
-    photo2 = models.ImageField(verbose_name='Фото файл', upload_to='photo/', blank=True, null=True,
+                             help_text='Загрузите фото файл в формате .jpg. Поля для фото заполняйте последовательно')
+    photo2 = models.ImageField(verbose_name='Фото файл 2', upload_to='photo/', blank=True, null=True,
                               help_text='Загрузите фото файл в формате .jpg')
-    photo3 = models.ImageField(verbose_name='Фото файл', upload_to='photo/', blank=True, null=True,
+    photo3 = models.ImageField(verbose_name='Фото файл 3', upload_to='photo/', blank=True, null=True,
                               help_text='Загрузите фото файл в формате .jpg')
-    photo4 = models.ImageField(verbose_name='Фото файл', upload_to='photo/', blank=True, null=True,
+    photo4 = models.ImageField(verbose_name='Фото файл 4', upload_to='photo/', blank=True, null=True,
                               help_text='Загрузите фото файл в формате .jpg')
-    photo5 = models.ImageField(verbose_name='Фото файл', upload_to='photo/', blank=True, null=True,
+    photo5 = models.ImageField(verbose_name='Фото файл 5', upload_to='photo/', blank=True, null=True,
                               help_text='Загрузите фото файл в формате .jpg')
     audio = models.FileField(verbose_name='Аудио файл', upload_to='audio/', blank=True, null=True,
-                             help_text='Загрузите аудио файл в формате .ogg')
+                             help_text='Загрузите аудио файл в формате .ogg. При загруженном аудио остальные поля (текст, emoji, фото, видео) должны быть пустыми')
     video = models.FileField(verbose_name='Видео файл', upload_to='video/', blank=True, null=True,
                              help_text='Загрузите видео файл в формате .mp4')
     count = models.CharField(max_length=15, verbose_name='Custom ID',
-                             help_text='Идентификатор, используется для указания следующего поста')
+                             help_text='Идентификатор, используется для указания следующего поста. Для первого сообщения указывайте "start"')
     timer = models.IntegerField(verbose_name='Таймер', blank=True, null=True,
                                 help_text='Заполняется в том случае, если данный пост должен отправляться через определенное время после предыдущего. Таймер указывается в секундах')
     time = models.TimeField(verbose_name='Время', blank=True, null=True,

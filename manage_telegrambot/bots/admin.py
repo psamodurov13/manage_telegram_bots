@@ -100,8 +100,8 @@ class PostAdmin(BaseAdmin):
                     'name': button.name,
                     'button_text': button.button_text,
                     'action': button.action.id,
-                    'button_url': button.button_url,
-                    'next_post_id': button.next_post.id
+                    'button_url': button.button_url if button.button_url else None,
+                    'next_post_id': button.next_post.id if button.next_post else None,
                 })
         logger.info(f'BUTTONS - {buttons}')
         post_info['buttons'] = buttons
